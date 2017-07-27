@@ -62,8 +62,7 @@ async function createNewUser(overrides) {
 
 //////// Elaboration & Feedback /////////
 /*
-http://ws.kcd.im/?ws=Testing&e=API%20Integration&em=
-*/
+http://ws.kcd.im/?ws=Testing&e=API%20Integration&em=jeffh@loar.net*/
 test.skip('I submitted my elaboration and feedback', () => {
   const submitted = false // change this when you've submitted!
   expect(true).toBe(submitted)
