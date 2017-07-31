@@ -11,10 +11,23 @@ import generateUserData from '../../../other/generate/user'
 // like that :)
 import startServer from '../../src/start-server'
 
+let server
+
+beforeAll(() => {
+  return startServer().then(s => {
+    server = s
+  })
+})
+
+afterAll(done => {
+  server.close(done)
+})
+
 // I'm going to give you this just so you don't have to look it up:
 const api = axios.create({
   baseURL: 'http://localhost:3000/api',
 })
+
 // Note also that the articles endpoints are at: api/articles
 // So to get articles, you can do: api.get('articles') which
 // will return a promise that resolves to the response from the
@@ -35,6 +48,12 @@ const api = axios.create({
 // you might consider making something similar for the articles
 // stuff
 const getUser = res => res.data.user
+
+test('test retrieve articles', () => {
+  return api.get('articles').then(response => {
+    console.log(response.data)
+  })
+})
 
 //////////////////////
 // 👋 Put your tests here
@@ -58,7 +77,6 @@ async function createNewUser(overrides) {
     },
   }
 }
-
 
 //////// Elaboration & Feedback /////////
 /*
