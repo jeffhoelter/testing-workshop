@@ -49,15 +49,60 @@ const api = axios.create({
 // stuff
 const getUser = res => res.data.user
 
-test('test retrieve articles', () => {
-  return api.get('articles').then(response => {
-    console.log(response.data)
+test('Article count verification', () => {
+  return api.get('articles?limit=100000000').then(response => {
+    const {articles, articlesCount} = response.data
+    expect(articles.length).toBe(articlesCount)
   })
 })
 
-//////////////////////
-// 👋 Put your tests here
-///////////////////////
+test('Article and Author schema verification', () => {
+  return api.get('articles?limit=1').then(response => {
+    const article = response.data.articles[0]
+
+    // article primitives
+    expect(article).toMatchObject({
+      title: expect.any(String),
+      description: expect.any(String),
+      body: expect.any(String),
+      slug: expect.any(String),
+      tagList: expect.any(Array),
+      createdAt: expect.any(String),
+      favorited: expect.any(Boolean),
+      favoritesCount: expect.any(Number),
+    })
+
+    // author primitives
+    expect(article.author).toMatchObject({
+      username: expect.any(String),
+      bio: expect.any(String),
+      image: expect.any(String),
+      following: expect.any(Boolean),
+    })
+  })
+})
+
+describe('authenticated', () => {
+  let user, cleanupCallback
+
+  beforeAll(async () => {
+    const createNewUserResult = await createNewUser()
+    user = createNewUserResult.user
+    cleanupCallback = createNewUserResult.cleanup
+    api.defaults.headers.common.authorization = `Token ${user.token}`
+  })
+
+  afterAll(async () => {
+    await cleanupCallback()
+    api.defaults.headers.common.authorization = ''
+  })
+
+  test('Feed verification', () => {
+    return api.get('articles/feed').then(response => {
+      // simply verifying we don't get a 401
+    })
+  })
+})
 
 // I've left this here for you as a little utility that's a little
 // domain-specific and isn't super pertinent to learning testing :)
