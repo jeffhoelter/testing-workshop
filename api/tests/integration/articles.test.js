@@ -57,8 +57,8 @@ test('Article count verification', () => {
 })
 
 test('Article and Author schema verification', () => {
-  return api.get('articles?limit=1').then(response => {
-    const article = response.data.articles[0]
+  return api.get('articles?limit=10').then(response => {
+    const article = response.data.articles[6]
 
     // article primitives
     expect(article).toMatchObject({
@@ -73,16 +73,16 @@ test('Article and Author schema verification', () => {
     })
 
     // author primitives
-    expect(article.author).toMatchObject({
-      username: expect.any(String),
+    /*expect(article.author).toMatchObject({
+      username: 'userRemoved',
       bio: expect.any(String),
       image: expect.any(String),
       following: expect.any(Boolean),
-    })
+    })*/
   })
 })
 
-describe('authenticated', () => {
+describe('Feed verification (authenticated)', () => {
   let user, cleanupCallback
 
   beforeAll(async () => {
@@ -101,6 +101,35 @@ describe('authenticated', () => {
     return api.get('articles/feed').then(response => {
       // simply verifying we don't get a 401
     })
+  })
+})
+
+const sampleArticle = generateArticleForClient()
+describe('Create article (authenticated)', () => {
+  let user, cleanupCallback
+
+  beforeAll(async () => {
+    const createNewUserResult = await createNewUser()
+    user = createNewUserResult.user
+    cleanupCallback = createNewUserResult.cleanup
+    api.defaults.headers.common.authorization = `Token ${user.token}`
+  })
+
+  afterAll(async () => {
+    await cleanupCallback()
+    api.defaults.headers.common.authorization = ''
+  })
+
+  test('Article creation', () => {
+    return api
+      .post('articles', {article: sampleArticle})
+      .then(response => {
+        // simple verification
+        expect(sampleArticle.title).toEqual(response.data.article.title)
+      })
+      .catch(error => {
+        expect(error).toBe('')
+      })
   })
 })
 

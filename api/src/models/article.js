@@ -21,14 +21,14 @@ function getArticleSchema(User) {
 
   ArticleSchema.plugin(uniqueValidator, {message: 'is already taken'})
 
-  ArticleSchema.pre('validate', function(next) {
-    this.slugify() // eslint-disable-line babel/no-invalid-this
+  ArticleSchema.pre('validate', next => {
+    //this.slugify() // eslint-disable-line babel/no-invalid-this
 
     next()
   })
 
   ArticleSchema.methods.slugify = function() {
-    this.slug = slug(this.title)
+    //this.slug = slug(this.title)
   }
 
   ArticleSchema.methods.updateFavoriteCount = function() {
